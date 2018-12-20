@@ -11,7 +11,7 @@ namespace Camera
 	public partial class Form1 : Form
 	{
 		private CameraController cameraController;
-		private List<String> fileCollection = new List<string>();
+		private List<string> fileCollection = new List<string>();
 		public Form1()
 		{
 			InitializeComponent();
@@ -35,18 +35,19 @@ namespace Camera
 
 			int index = deviceListBox.SelectedIndex;
 			resolutionBox.DataSource = cameraController.InitResolution(index);
-
-			/*if (resolutionBox.Items.Count > 0)
-			{
-				resolutionBox.SelectedIndex = resolutionBox.FindStringExact(resolutionBox.DataSource[0]);
-			}*/
 		}
 
 		private void InitListView()
 		{
-			DirectoryInfo dinfo = new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\");
+			string filename = AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
 
-			// get all files
+			if (!Directory.Exists(filename))
+			{
+				Directory.CreateDirectory(filename);
+			}
+
+			DirectoryInfo dinfo = new DirectoryInfo(filename);
+
 			FileInfo[] filesInfo = dinfo.GetFiles();
 
 			foreach (FileInfo fi in filesInfo)

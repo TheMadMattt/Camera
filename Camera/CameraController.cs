@@ -1,9 +1,10 @@
-﻿using Accord.Video.FFMPEG;
+﻿
 using AForge.Video.DirectShow;
 using AForge.Vision.Motion;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Accord.Video.FFMPEG;
 
 namespace Camera
 {

@@ -40,11 +40,11 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.cameraPage = new System.Windows.Forms.TabPage();
+			this.motionBox = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
 			this.recordedFilesPage = new System.Windows.Forms.TabPage();
 			this.fileList = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.label2 = new System.Windows.Forms.Label();
-			this.motionBox = new System.Windows.Forms.ComboBox();
 			this.tabControl.SuspendLayout();
 			this.cameraPage.SuspendLayout();
 			this.recordedFilesPage.SuspendLayout();
@@ -173,6 +173,37 @@
 			this.cameraPage.Text = "Camera";
 			this.cameraPage.UseVisualStyleBackColor = true;
 			// 
+			// motionBox
+			// 
+			this.motionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.motionBox.FormattingEnabled = true;
+			this.motionBox.Items.AddRange(new object[] {
+            "0",
+            "10",
+            "20",
+            "30",
+            "40",
+            "50",
+            "60",
+            "70",
+            "80",
+            "90",
+            "95",
+            "100"});
+			this.motionBox.Location = new System.Drawing.Point(442, 156);
+			this.motionBox.Name = "motionBox";
+			this.motionBox.Size = new System.Drawing.Size(168, 24);
+			this.motionBox.TabIndex = 11;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(443, 136);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(167, 17);
+			this.label2.TabIndex = 10;
+			this.label2.Text = "Czułość Motion Detection";
+			// 
 			// recordedFilesPage
 			// 
 			this.recordedFilesPage.Controls.Add(this.fileList);
@@ -201,37 +232,6 @@
 			// 
 			this.columnHeader1.Text = "Filename";
 			this.columnHeader1.Width = 703;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(443, 136);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(167, 17);
-			this.label2.TabIndex = 10;
-			this.label2.Text = "Czułość Motion Detection";
-			// 
-			// motionBox
-			// 
-			this.motionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.motionBox.FormattingEnabled = true;
-			this.motionBox.Items.AddRange(new object[] {
-            "0",
-            "10",
-            "20",
-            "30",
-            "40",
-            "50",
-            "60",
-            "70",
-            "80",
-            "90",
-            "95",
-            "100"});
-			this.motionBox.Location = new System.Drawing.Point(442, 156);
-			this.motionBox.Name = "motionBox";
-			this.motionBox.Size = new System.Drawing.Size(168, 24);
-			this.motionBox.TabIndex = 11;
 			// 
 			// Form1
 			// 
