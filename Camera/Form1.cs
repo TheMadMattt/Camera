@@ -77,13 +77,15 @@ namespace Camera
 				{
 					cameraController.camera.SignalToStop();
 					cameraController.camera.WaitForStop();
-					makePhoto.Enabled = false;
+					makePhotoButton.Enabled = false;
 					cameraSettingsButton.Enabled = false;
 					recordVideoButton.Enabled = false;
 					cameraPage.BackColor = Color.White;
+					cameraButton.Text = "Start capture";
 				}
 				else
 				{
+					cameraButton.Text = "Stop capture";
 					int deviceIndex = deviceListBox.SelectedIndex, resolutionIndex = resolutionBox.SelectedIndex;
 
 					cameraController.InitCamera(deviceIndex,resolutionIndex);
@@ -94,7 +96,7 @@ namespace Camera
 
 					cameraController.camera.Start();
 
-					makePhoto.Enabled = true;
+					makePhotoButton.Enabled = true;
 					cameraSettingsButton.Enabled = true;
 					recordVideoButton.Enabled = true;
 				}

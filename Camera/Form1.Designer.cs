@@ -32,7 +32,7 @@
 			this.deviceListBox = new System.Windows.Forms.ComboBox();
 			this.findDevicesButton = new System.Windows.Forms.Button();
 			this.cameraButton = new System.Windows.Forms.Button();
-			this.makePhoto = new System.Windows.Forms.Button();
+			this.makePhotoButton = new System.Windows.Forms.Button();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.cameraSettingsButton = new System.Windows.Forms.Button();
 			this.recordVideoButton = new System.Windows.Forms.Button();
@@ -83,20 +83,20 @@
 			this.cameraButton.Name = "cameraButton";
 			this.cameraButton.Size = new System.Drawing.Size(173, 43);
 			this.cameraButton.TabIndex = 3;
-			this.cameraButton.Text = "Start/Stop capture";
+			this.cameraButton.Text = "Start";
 			this.cameraButton.UseVisualStyleBackColor = true;
 			this.cameraButton.Click += new System.EventHandler(this.cameraButton_Click);
 			// 
-			// makePhoto
+			// makePhotoButton
 			// 
-			this.makePhoto.Enabled = false;
-			this.makePhoto.Location = new System.Drawing.Point(443, 6);
-			this.makePhoto.Name = "makePhoto";
-			this.makePhoto.Size = new System.Drawing.Size(120, 53);
-			this.makePhoto.TabIndex = 4;
-			this.makePhoto.Text = "Zrób zdjęcie";
-			this.makePhoto.UseVisualStyleBackColor = true;
-			this.makePhoto.Click += new System.EventHandler(this.makePhoto_Click);
+			this.makePhotoButton.Enabled = false;
+			this.makePhotoButton.Location = new System.Drawing.Point(443, 6);
+			this.makePhotoButton.Name = "makePhotoButton";
+			this.makePhotoButton.Size = new System.Drawing.Size(120, 53);
+			this.makePhotoButton.TabIndex = 4;
+			this.makePhotoButton.Text = "Zrób zdjęcie";
+			this.makePhotoButton.UseVisualStyleBackColor = true;
+			this.makePhotoButton.Click += new System.EventHandler(this.makePhoto_Click);
 			// 
 			// saveFileDialog
 			// 
@@ -162,7 +162,7 @@
 			this.cameraPage.Controls.Add(this.deviceListBox);
 			this.cameraPage.Controls.Add(this.findDevicesButton);
 			this.cameraPage.Controls.Add(this.cameraButton);
-			this.cameraPage.Controls.Add(this.makePhoto);
+			this.cameraPage.Controls.Add(this.makePhotoButton);
 			this.cameraPage.Controls.Add(this.resolutionBox);
 			this.cameraPage.Controls.Add(this.recordVideoButton);
 			this.cameraPage.Location = new System.Drawing.Point(4, 25);
@@ -255,7 +255,7 @@
         private System.Windows.Forms.ComboBox deviceListBox;
         private System.Windows.Forms.Button findDevicesButton;
         private System.Windows.Forms.Button cameraButton;
-		private System.Windows.Forms.Button makePhoto;
+		private System.Windows.Forms.Button makePhotoButton;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private System.Windows.Forms.Button cameraSettingsButton;
 		private System.Windows.Forms.Button recordVideoButton;
