@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Accord.IO;
 using Accord.Video.FFMPEG;
-using AForge.Controls;
+using Accord.Video.VFW;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using AForge.Vision.Motion;
@@ -19,52 +14,61 @@ namespace Camera
 {
 	public partial class Form1 : Form
 	{
-		private FilterInfoCollection videoDeviceCollection;
-		private VideoCaptureDevice camera;
-		private Bitmap picture;
-		private VideoFileWriter videoWriter;
-		private MotionDetector detector;
-		private bool recording = false;
-
+		private CameraController cameraController;
+		private List<String> fileCollection = new List<string>();
 		public Form1()
 		{
 			InitializeComponent();
-			Text = "Camera";
+			motionBox.SelectedIndex = 0;
+			cameraController = new CameraController();
+			InitListView();
 		}
 
 		private void findDevicesButton_Click(object sender, EventArgs e)
 		{
 			deviceListBox.Items.Clear();
-			videoDeviceCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
-			foreach (FilterInfo videoDevice in videoDeviceCollection)
-			{
-				deviceListBox.Items.Add(videoDevice.Name);
-			}
+			cameraController.getCameraDevices();
+
+			deviceListBox.DataSource = cameraController.getCamerasName();
 
 			if (deviceListBox.Items.Count > 0)
 			{
-				deviceListBox.SelectedIndex = deviceListBox.FindStringExact(videoDeviceCollection[0].Name);
+				deviceListBox.SelectedIndex = deviceListBox.FindStringExact(cameraController.videoDeviceCollection[0].Name);
 			}
 
-			camera = new VideoCaptureDevice();
+			int index = deviceListBox.SelectedIndex;
+			resolutionBox.DataSource = cameraController.InitResolution(index);
 
-			InitResolution();
+			/*if (resolutionBox.Items.Count > 0)
+			{
+				resolutionBox.SelectedIndex = resolutionBox.FindStringExact(resolutionBox.DataSource[0]);
+			}*/
 		}
 
-		private void InitResolution()
+		private void InitListView()
 		{
-			VideoCaptureDevice getResolution =
-				new VideoCaptureDevice(videoDeviceCollection[deviceListBox.SelectedIndex].MonikerString);
-			resolutionBox.Items.Clear();
-			for (int i = 0; i < getResolution.VideoCapabilities.Length; i++)
-			{
-				resolutionBox.Items.Add(getResolution.VideoCapabilities[i].FrameSize.ToString());
-			}
+			DirectoryInfo dinfo = new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\");
 
-			if (resolutionBox.Items.Count > 0)
+			// get all files
+			FileInfo[] filesInfo = dinfo.GetFiles();
+
+			foreach (FileInfo fi in filesInfo)
 			{
-				resolutionBox.SelectedIndex = resolutionBox.FindStringExact(getResolution.VideoCapabilities[0].FrameSize.ToString());
+				fileCollection.Add(fi.Directory + @"\" + fi.ToString());
+			}
+			foreach (var file in fileCollection)
+			{
+				fileList.Items.Add(file);
+			}
+		}
+
+		private void UpdateListView()
+		{
+			fileList.Items.Clear();
+			foreach (var file in fileCollection)
+			{
+				fileList.Items.Add(file);
 			}
 		}
 
@@ -72,27 +76,26 @@ namespace Camera
 		{
 			try
 			{
-				if (camera.IsRunning)
+				if (cameraController.camera.IsRunning)
 				{
-					camera.SignalToStop();
-					camera.WaitForStop();
+					cameraController.camera.SignalToStop();
+					cameraController.camera.WaitForStop();
 					makePhoto.Enabled = false;
 					cameraSettingsButton.Enabled = false;
 					recordVideoButton.Enabled = false;
+					cameraPage.BackColor = Color.White;
 				}
 				else
 				{
-					camera = new VideoCaptureDevice(videoDeviceCollection[deviceListBox.SelectedIndex].MonikerString);
+					int deviceIndex = deviceListBox.SelectedIndex, resolutionIndex = resolutionBox.SelectedIndex;
 
-					detector = new MotionDetector(new SimpleBackgroundModelingDetector(), new MotionAreaHighlighting());
+					cameraController.InitCamera(deviceIndex,resolutionIndex);
 
-					camera.VideoResolution = camera.VideoCapabilities[resolutionBox.SelectedIndex];
+					videoPlayer.VideoSource = cameraController.camera;
 
-					camera.NewFrame += Camera_NewFrame;
+					cameraController.camera.NewFrame += Camera_NewFrame;
 
-					videoPlayer.VideoSource = camera;
-
-					camera.Start();
+					cameraController.camera.Start();
 
 					makePhoto.Enabled = true;
 					cameraSettingsButton.Enabled = true;
@@ -105,76 +108,101 @@ namespace Camera
 			}
 		}
 
-		private void Camera_NewFrame(object sender, NewFrameEventArgs eventArgs)
+		public void Camera_NewFrame(object sender, NewFrameEventArgs eventArgs)
 		{
-			picture = eventArgs.Frame.Clone() as Bitmap;
+			float motionLevel = (float)(100 - int.Parse(motionBox.SelectedItem.ToString()))/100;
+			cameraController.picture = eventArgs.Frame.Clone() as Bitmap;
 
-			if (recording)
+			if (cameraController.recording)
 			{
-				videoWriter.WriteVideoFrame(picture);
+				cameraController.WriteFrame();
 			}
-
-			if (detector.ProcessFrame(picture) >= 0.05)
+			if (cameraController.GetProcessFrame() >= motionLevel)
 			{
-				this.BackColor = Color.Red;
+				cameraPage.BackColor = Color.Red;
 			}
 			else
 			{
-				this.BackColor = DefaultBackColor;
+				cameraPage.BackColor = Color.White;
 			}
 		}
 
 		private void makePhoto_Click(object sender, EventArgs e)
 		{
-			camera.Stop();
+			cameraController.camera.Stop();
 			saveFileDialog.Filter = @"Obraz bmp|*.bmp |Obraz JPEG |*.jpg";
-			saveFileDialog.FileName = "";
+			saveFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
+			if (!Directory.Exists(saveFileDialog.InitialDirectory))
+			{
+				Directory.CreateDirectory(saveFileDialog.InitialDirectory);
+			}
+			saveFileDialog.RestoreDirectory = true;
+			saveFileDialog.FileName = String.Empty;
 			if (saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				picture.Save(saveFileDialog.FileName);
+				cameraController.picture.Save(saveFileDialog.FileName);
+				fileCollection.Add(saveFileDialog.FileName);
 			}
-			camera.Start();
+			cameraController.camera.Start();
+			UpdateListView();
 		}
 
 		private void cameraSettingsButton_Click(object sender, EventArgs e)
 		{
-			camera.DisplayPropertyPage(IntPtr.Zero);
+			cameraController.CameraSettings();
 		}
 
 		private void recordVideoButton_Click(object sender, EventArgs e)
 		{
-			if (recording)
+			if (!cameraController.StopRecording())
 			{
 				recordVideoButton.Text = "Nagraj film";
-				recording = false;
-				videoWriter.Close();
 			}
 			else
 			{
 				recordVideoButton.Text = "Zatrzymaj nagrywanie";
-
 				saveFileDialog.Filter = @"Film |*.avi";
-				saveFileDialog.FileName = "";
+				saveFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
+				if (!Directory.Exists(saveFileDialog.InitialDirectory))
+				{
+					Directory.CreateDirectory(saveFileDialog.InitialDirectory);
+				}
+				saveFileDialog.RestoreDirectory = true;
+				saveFileDialog.FileName = String.Empty;
 				if (saveFileDialog.ShowDialog() == DialogResult.OK)
 				{
-					videoWriter = new VideoFileWriter();
-					int h = picture.Height;
-					int w = picture.Width;
-					videoWriter.Open(saveFileDialog.FileName, w, h);
-					recording = true;
+					cameraController.SaveVideo(saveFileDialog.FileName);
+					fileCollection.Add(saveFileDialog.FileName);
 				}
 			}
+			UpdateListView();
 		}
 
 		private void resolutionBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (camera.IsRunning)
+			int index = resolutionBox.SelectedIndex;
+
+			cameraController.ChangeResolution(index);
+		}
+
+		private void fileList_DoubleClick(object sender, EventArgs e)
+		{
+			if (fileList.SelectedItems.Count != 0)
 			{
-				camera.SignalToStop();
-				camera.WaitForStop();
-				camera.VideoResolution = camera.VideoCapabilities[resolutionBox.SelectedIndex];
-				detector = new MotionDetector(new SimpleBackgroundModelingDetector(), new MotionAreaHighlighting());
-				camera.Start();
+				try
+				{
+					string fileToOpen;
+
+					fileToOpen = fileList.SelectedItems[0].Text;
+
+					System.Diagnostics.Debug.WriteLine(fileToOpen);
+					System.Diagnostics.Process.Start(fileToOpen);
+				}
+				catch (Win32Exception ex)
+				{
+
+					MessageBox.Show("Failed opening the file: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
 			}
 		}
 	}
