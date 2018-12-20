@@ -4,11 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using Accord.Video.FFMPEG;
-using Accord.Video.VFW;
 using AForge.Video;
-using AForge.Video.DirectShow;
-using AForge.Vision.Motion;
 
 namespace Camera
 {
