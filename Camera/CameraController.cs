@@ -22,6 +22,7 @@ namespace Camera
 			videoDeviceCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
 			camera = new VideoCaptureDevice();
+
 		}
 
 		public void getCameraDevices()
@@ -99,12 +100,10 @@ namespace Camera
 			recording = true;
 		}
 
-		public bool StopRecording()
+		public void StopRecording()
 		{
 			recording = false;
 			videoWriter.Close();
-
-			return recording;
 		}
 	}
 }

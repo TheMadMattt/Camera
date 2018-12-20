@@ -130,7 +130,7 @@ namespace Camera
 		{
 			cameraController.camera.Stop();
 			saveFileDialog.Filter = @"Obraz bmp|*.bmp |Obraz JPEG |*.jpg";
-			saveFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
+			saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
 			if (!Directory.Exists(saveFileDialog.InitialDirectory))
 			{
 				Directory.CreateDirectory(saveFileDialog.InitialDirectory);
@@ -153,15 +153,16 @@ namespace Camera
 
 		private void recordVideoButton_Click(object sender, EventArgs e)
 		{
-			if (!cameraController.StopRecording())
+			if (cameraController.recording)
 			{
+				cameraController.StopRecording();
 				recordVideoButton.Text = "Nagraj film";
 			}
 			else
 			{
 				recordVideoButton.Text = "Zatrzymaj nagrywanie";
 				saveFileDialog.Filter = @"Film |*.avi";
-				saveFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
+				saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"Nagrania\";
 				if (!Directory.Exists(saveFileDialog.InitialDirectory))
 				{
 					Directory.CreateDirectory(saveFileDialog.InitialDirectory);
